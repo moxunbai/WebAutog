@@ -8,6 +8,5 @@ ti.init(arch=ti.gpu)
  
 cssFields = CssBgFields()
 cssFields.setup_data_cpu(20)
-
+ 
 HTMLEngine.load('01.html',None)
-

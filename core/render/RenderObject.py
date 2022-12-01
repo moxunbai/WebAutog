@@ -178,7 +178,10 @@ class RenderObject(FieldBase):
 
     @ti.func 
     def caclColor(self,heightl_c,lowl_c,opacity):
-        return heightl_c*(1-opacity)+lowl_c*opacity
+        result = heightl_c
+        if lowl_c[0]>=0 and lowl_c[1]>=0 and lowl_c[2]>=0:
+            result =heightl_c*(1-opacity)+lowl_c*opacity
+        return result
 
     
 
@@ -224,7 +227,6 @@ class RenderObject(FieldBase):
               abs_x=i+x+20
               abs_y=frame_h-y+j-20
               fontColor = vec3(charBitmap[i,j,0],charBitmap[i,j,1],charBitmap[i,j,2])
-              if fontColor[0]>0:
-                  print(abs_x,abs_y,fontColor)
-              self.doc.f_layer_frames[abs_x,abs_y]=fontColor
-            #   self.doc.f_layer_frames[abs_x,abs_y]=self.caclColor(self.doc.f_layer_frames[abs_x,abs_y],fontColor,opacity) 
+              
+            #   self.doc.f_layer_frames[abs_x,abs_y]=fontColor
+              self.doc.f_layer_frames[abs_x,abs_y]=self.caclColor(self.doc.f_layer_frames[abs_x,abs_y],fontColor,opacity) 

@@ -28,3 +28,40 @@ class RenderText(RenderBox):
             # print(type(bitmap))
            self.renserChar(bitmap,x,y,self.getAddr())  
            x+= bitmap.shape[0]     
+
+    
+    def caclWidth(self):
+        parentContentWidth = p.contentWidth() if (p := self.containerBlock()) else 0
+        w=0
+        for bitmap in self.textBitmaps:
+            w+=bitmap.shape[0]  
+
+        self.frameRect['width']=  min(parentContentWidth,w) 
+
+    def caclLogicHeight(self):
+        h=0
+        for bitmap in self.textBitmaps:
+            h=max(h,bitmap.shape[1] ) 
+          
+        self.frameRect['height']=h
+
+    def computeTop(self):
+        t=0.
+        if p := self.parent:  
+            t=p.logicalTop()+p.paddingTop()+p.borderTop() 
+         
+        self.frameRect['y']=t    
+        
+    def computeLeft(self):
+        
+        l=0  
+        if p := self.parent: 
+            l= p.logicalLeft()+p.paddingLeft()
+                       
+        self.frameRect['x']=l
+
+    def layout(self):
+        self.caclWidth()
+        self.computeTop()
+        self.computeLeft()
+        self.caclLogicHeight()       

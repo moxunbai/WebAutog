@@ -49,6 +49,7 @@ class TureTypeLoader():
         rows = bitmap.rows
         # img=np.zeros(shape=(fontSize+1,fontSize+1))
         img=np.zeros(shape=(fontSize+1,fontSize+1,3),dtype=np.float32)
+        img.fill(-1)
         glyph_pixels = bitmap.buffer
 
         offset_x=0
