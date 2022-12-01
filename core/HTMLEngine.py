@@ -101,6 +101,11 @@ def buildRenderTree():
         if renderObj:
             renderObj.style=StyleObject(computedStyle)
             renderObj.setDocument(document) 
+            if dom.data:
+                textObj=RenderView.genTextObj(dom.data)
+                textObj.style=renderObj.style
+                textObj.setDocument(document)
+                renderObj.addChild(textObj)
             for child in dom.children:
                 # print('child',child.tag)
                 childR = walkDomTree(child)

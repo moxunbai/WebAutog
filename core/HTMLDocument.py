@@ -6,6 +6,7 @@ from . import FieldManager as fm
 import importlib
 import os
 import sys
+from .FontUtil import TureTypeLoader
 
 field_max_len=6
 
@@ -18,6 +19,8 @@ class HTMLDocument():
     classtype_tield={}
     option={}
 
+    ttfLoader=None
+
     def __init__(self, rootDom, option=None) -> None:
         if option is None:
             option = {'viewportWidth':900,'viewportHeight':800}
@@ -25,6 +28,9 @@ class HTMLDocument():
         HTMLDocument.option=option
         fm.addFieldDeclare(HTMLDocument.__declare_field__)
         fm.addFieldPlaced(HTMLDocument.__place_field__)
+
+        ttfPath = os.path.abspath('.')+os.sep+__package__+os.sep+'assets'+os.sep
+        self.ttfLoader = TureTypeLoader(f'{ttfPath}Source_Han_Serif_CN_VF_Regular.ttf')
 
     @staticmethod
     def __declare_field__():

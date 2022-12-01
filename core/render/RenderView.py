@@ -1,6 +1,7 @@
 
 from .RenderBlock import RenderBlock
 from .RenderInline import RenderInline
+from .RenderText import RenderText
 
 class RenderView(RenderBlock):
 
@@ -23,16 +24,29 @@ class RenderView(RenderBlock):
         return True    
     @staticmethod
     def genObj(dom,style):
+        renderObj = None
         if dom is None or not RenderView.is_view(dom):
             return None
         if dom.tag == 'html':
             return  RenderView(dom)
         d = style['display']
         if d=='block':
-            return RenderBlock(dom)
+            renderObj =  RenderBlock(dom)
         elif d=='inline':
-            return RenderInline(dom) 
+            renderObj =  RenderInline(dom) 
         else :
              return None
+        # if renderObj and dom.data :
+        #     textObj = RenderText(dom.data)
+        #     textObj.style=style
+        #     textObj.setDocument(document)
+        #     renderObj.addChild(textObj)
+        return renderObj     
+             
+           
+    @staticmethod
+    def genTextObj(text):
+        
+        return RenderText(text)     
              
            

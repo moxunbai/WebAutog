@@ -150,6 +150,8 @@ class StyleObject(FieldBase):
         self.min_width=[0.0,-1]
         self.height=[0.0,-1]
         self.display=0
+        # 0 :none 1:left 2:right
+        self.float_type=0
         self.margin=[[0.,0],[0.,0],[0.,0],[0.,0]]
         self.padding=[[0.,0],[0.,0],[0.,0],[0.,0]]
 
@@ -184,6 +186,11 @@ class StyleObject(FieldBase):
                         self.display=1
                     elif v == 'none':
                         self.display=-1
+                case 'float':
+                    if v == 'left':
+                        self.float_type=1
+                    elif v == 'right':
+                        self.float_type=2
                 case 'position':
                     if v =='relation':
                         self.pos_type =1
@@ -229,8 +236,14 @@ class StyleObject(FieldBase):
                 case 'background'|'background-color':
                     if v!='none':
                         self.bg_use=1
-                        self.bg_color= parseColor(v)  
-                        print(self.bg_color,v)
+                        self.bg_color= parseColor(v)   
+                case 'font-size':
+                    if v!='none':
+                        self.font_size=max(10,parsePxValue(v))     
+                case 'color':
+                    if v!='none': 
+                        self.font_color= parseColor(v)  
+                        
                 case 'opacity':
                     opy = float(v)
                     
@@ -267,7 +280,18 @@ class StyleObject(FieldBase):
         return bool(v and v[1]==1)
 
     def isBlock(self):
-        return self.display==0    
+        return self.display==0   
+
+    def isFloat(self):
+        return self.float_type>0   
+         
+    def floatLeft(self):
+        return self.float_type==1    
+
+    def floatRight(self):
+        return self.float_type==2  
+
+
 
     def cssWidth(self,parentContentWidth):
         if self.width[1] == -1:
@@ -312,6 +336,12 @@ class StyleObject(FieldBase):
                         case _:
                             i=0
                     return   self.isPercentValue(v[i])                      
+
+    def fontSize(self):
+        return self.font_size
+        
+    def fontColor(self):
+        return self.font_color
 
     def fillField(self):
         if styleFields := fm.findFieldByName(self.getBaseName()):

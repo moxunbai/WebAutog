@@ -2,8 +2,6 @@
 from core.CssBgObject import *
 from core import HTMLEngine 
 import taichi as ti
-
-
  
 
 ti.init(arch=ti.gpu)

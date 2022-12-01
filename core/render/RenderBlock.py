@@ -27,18 +27,51 @@ class RenderBlock(RenderBox):
 
     def computeTop(self):
         t=0.
-        if previous := self.previousSibling(): 
+        isFloat=self.isFloat()
+        previous = None
+        # if isFloat:
+        #    previous = self.previousFloatLeft() if self.floatLeft() else self.previousFloatRight()
+        # else:
+        #    previous = self.previousSibling()    
+        previous = self.previousSibling()    
+        if previous : 
             # print('computeTop==previous==',self.dom.tag,self.dom.id,previous.dom.tag,previous.dom.id)
-            t = previous.logicalTop()+previous.logicHeight() + self.marginTop()   
+            availableWidth = 0
+            # if p := self.containerBlock():
+            #     if isFloat:
+            #         availableWidth = p.contentWidth()-previous.logicalLeft()-previous.clientWidth() if self.floatLeft() else 
+            if not previous.isFloat():        
+               t = previous.logicalTop()+previous.logicHeight() + self.marginTop()   
+            else:
+               if p := self.containerBlock():
+                    availableWidth = p.contentWidth()-previous.logicalLeft()-previous.clientWidth() if self.floatLeft()   else p.contentWidth()-previous.logicalLeft() 
+               if availableWidth >self.logicalWidth():
+                  t = previous.logicalTop() 
+               else:
+                   t = previous.logicalTop()+previous.logicHeight()                
         else: 
-           
-
-            t=p.logicalTop()+p.paddingTop()+ self.marginTop()   if (p := self.containerBlock()) else 0
+            t=p.logicalTop()+p.paddingTop()+p.borderTop()+ self.marginTop()   if (p := self.containerBlock()) else 0
         self.frameRect['y']=t    
         # print('self top===:',self.dom.tag,self.dom.id,t,self.marginTop(),self.frameRect['y'],self.logicalTop() )
 
     def computeLeft(self):
-        l=p.logicalLeft()+p.paddingLeft()+ self.marginLeft()   if (p := self.containerBlock()) else 0
+        previous = self.previousSibling()   
+        l=0 
+        p = self.containerBlock()
+        if previous : 
+            if not previous.isFloat():  
+               l=p.logicalLeft()+p.paddingLeft()+ self.marginLeft()   if p else 0
+            else:
+               availableWidth = 0
+               if p := self.containerBlock():
+                    availableWidth = p.contentWidth()-previous.logicalLeft()-previous.clientWidth()-self.marginLeft() if self.floatLeft()   else p.contentWidth()-previous.logicalLeft() -self.marginRight()
+               if availableWidth >self.logicalWidth():
+                  l = previous.logicalLeft()+ previous.logicalWidth()+self.marginLeft()
+               else:  
+                   if p :
+                     l= p.logicalLeft()+p.paddingLeft()+ self.marginLeft() if self.floatLeft() else p.logicalLeft()-p.logicalLeft()-p.paddingRight()- self.marginRight()
+        else:
+            l= p.logicalLeft()+p.paddingLeft()+ self.marginLeft()  if p else 0.            
         self.frameRect['x']=l
 
     def layout(self):
@@ -46,9 +79,14 @@ class RenderBlock(RenderBox):
         self.computeTop()
         self.computeLeft()
         self.caclLogicHeight()
+        curMaxHeight=0
+        curX=0
+        baseline=self.paddingTop()
         child = self.firstChild()
         while child: 
            child.layout()
+        #    if child.isInline():
+
            if not self.style.isIntrinsicHeight():
               self.setLogicalHeight(self.logicHeight() + child.logicHeight()+child.marginTop())
            child = child.nextSibling()

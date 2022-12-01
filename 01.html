@@ -4,13 +4,14 @@
 <body>
 <!-- test html parser -->
      
-    <div id="div1" style="width:100px;height:70px;color:#ffffff;" class="name">
-        Hello!
-        <div id="child" class="child">
-
-        </div>
+    <div id="div1" style="width:100px;height:70px;color:#ff0000;" class="name">
+        哈哈
+        
     </div>
     <div id="div2" class="div2">
+        <div class="block1"></div>
+        <div class="block1"></div>
+        <div class="block1"></div>
 
     </div>
     <script src="01_script.py"></script>
@@ -36,6 +37,14 @@
         height:20px;
         background-color: #cccccc;
         border:4px solid #00ff00;
+    }
+    .block1{
+        background-color: #333333;
+        border:1px solid #ff0000;
+        float:left;
+        width:100px;
+        height:18px;
+        margin-left:10px;
     }
 </style>
 </html>

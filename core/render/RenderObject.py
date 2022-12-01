@@ -82,7 +82,10 @@ class RenderObject(FieldBase):
     def needsLayout(self) ->bool:
         return True
 
-    def layout():
+    def layout(self):
+        pass
+
+    def paintText(self):
         pass
 
     def paint(self):
@@ -90,7 +93,9 @@ class RenderObject(FieldBase):
         if thisField := self.doc.getObjStructField(self):
             if self.style:
                 thisField.style_addr = self.style.getAddr() 
-            self.renderByTi(self.getAddr())        
+            self.renderByTi(self.getAddr())  
+            if self.isText:
+               self.paintText()      
         child = self.firstChild()
         while child: 
            child.paint()
@@ -102,6 +107,15 @@ class RenderObject(FieldBase):
 
     def isBlock(self):
         return   self.style.isBlock() if self.style else False 
+    def isFloat(self):
+        return   self.style.isFloat() if self.style else False 
+    def floatLeft(self):
+        return   self.style.floatLeft() if self.style else False 
+    def floatRight(self):
+        return   self.style.floatLeft() if self.style else False 
+
+    def isInline(self):
+        return self.inline    
 
     def containerBlock(self):
         p = self.parent
@@ -183,11 +197,11 @@ class RenderObject(FieldBase):
         style_addr = obj_field.style_addr
         if style_addr>-1:
             s = self.doc.f_styles[style_addr]
+            opacity=s.opacity
             for i,j in ti.ndrange(w, h):
                 abs_x = i+x
                 abs_y = frame_h-j-y
                 in_pos,border_color  = self.inBorder(i,j,w,h,s)
-                opacity=s.opacity
                 if in_pos>-1:
                     # print(border_color)
                     self.doc.f_layer_frames[abs_x,abs_y]=self.caclColor(self.doc.f_layer_frames[abs_x,abs_y],border_color,opacity)
@@ -197,3 +211,20 @@ class RenderObject(FieldBase):
                         bg_color[k]=s.bg_color[k]
                     # print(bg_color)    
                     self.doc.f_layer_frames[abs_x,abs_y]+=self.caclColor(self.doc.f_layer_frames[abs_x,abs_y],bg_color,opacity)   
+
+    @ti.kernel
+    def renserChar(self,charBitmap:ti.types.ndarray(),x:ti.i32,y:ti.i32,objAddr:ti.i32):
+        obj_field = self.doc.f_render_objects[objAddr]
+        style_addr = obj_field.style_addr
+        s = self.doc.f_styles[style_addr]
+        (frame_w,frame_h)=self.doc.f_layer_frames.shape
+        opacity=s.opacity
+        for i,j in ti.ndrange(charBitmap.shape[0],charBitmap.shape[1]):
+            # for j in range()
+              abs_x=i+x+20
+              abs_y=frame_h-y+j-20
+              fontColor = vec3(charBitmap[i,j,0],charBitmap[i,j,1],charBitmap[i,j,2])
+              if fontColor[0]>0:
+                  print(abs_x,abs_y,fontColor)
+              self.doc.f_layer_frames[abs_x,abs_y]=fontColor
+            #   self.doc.f_layer_frames[abs_x,abs_y]=self.caclColor(self.doc.f_layer_frames[abs_x,abs_y],fontColor,opacity) 

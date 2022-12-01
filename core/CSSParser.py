@@ -7,7 +7,7 @@ class CSSParser():
     rule_list = []
     def __init__(self) -> None:
         # print('file===',os.path.abspath('.')+os.sep+__package__)
-        path = os.path.abspath('.')+os.sep+__package__+os.sep
+        path = os.path.abspath('.')+os.sep+__package__+os.sep+'assets'+os.sep
         with open(f'{path}useragent.css', 'r') as f:
             c= f.read()
             self.parseIn(c,0)

@@ -75,6 +75,9 @@ class RenderBox(RenderObject):
     def contentWidth(self):
         return self.clientWidth()-self.paddingLeft()-self.paddingRight()
 
+    def contentTop(self):
+        return max(0.,self.logicalTop()-self.paddingTop())    
+
     def logicHeight(self):
         return self.frameRect['height']
 
@@ -90,5 +93,28 @@ class RenderBox(RenderObject):
     def setLogicalWidth(self,w) :
         self.frameRect['width']=w   
 
+    def logicalWidth(self) :
+        return self.frameRect['width']
+    def logicalHeight(self) :
+        return self.frameRect['height']
+
     def isIntrinsicHeight(self):
         return self.style.isIntrinsicHeight()
+
+    def previousFloatLeft(self):
+        pre = self.previousSibling()
+        while pre :
+            if   pre.isFloat() and   pre.floatLeft():
+                break
+            else:
+                pre = pre.previousSibling()
+        return pre  
+
+    def previousFloatRight(self):
+        pre = self.previousSibling()
+        while pre :
+            if   pre.isFloat() and   pre.floatRight():
+                break
+            else:
+                pre = pre.previousSibling()
+        return pre    
