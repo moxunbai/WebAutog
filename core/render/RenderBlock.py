@@ -1,17 +1,33 @@
 from .RenderBox import RenderBox
-
+from ..event.EventListener import EventListener
 
 class RenderBlock(RenderBox):
 
     def __init__(self,dom) -> None:
         super().__init__()
         self.dom=dom
+        if dom:
+            dom.render = self
         def onFrameRectChange(name,oldVal,newValue):
-            # print('frameRect change',self.dom.tag,name,newValue)
             self.fillInFieldFrameRect()
 
         for k in self.frameRect:
             self.frameRect.addListener(k,onFrameRectChange)
+
+        self.watchDom()    
+
+    def updateStyles(self,e): 
+        newStyles = self.dom.computeStyles(self.dom.cssRules) 
+        self.style.setData(newStyles)
+        print('newStyles',newStyles['color'],self.style.font_color)
+        self.m_needsUpdateField = False
+        self.reLayout()
+        self.rePaint()
+                 
+
+    def watchDom(self):
+        if self.dom:
+            self.dom.addEventListener('cssChange',EventListener(self.updateStyles))        
 
     def caclWidth(self):
         parentContentWidth = p.contentWidth() if (p := self.containerBlock()) else 0
@@ -83,11 +99,14 @@ class RenderBlock(RenderBox):
         curX=0
         baseline=self.paddingTop()
         child = self.firstChild()
+        if self.dom.id:
+            print(self.dom.id,self.logicalLeft(),self.logicalTop())
         while child: 
            child.layout()
         #    if child.isInline():
 
-           if not self.style.isIntrinsicHeight():
+           if not self.style.isIntrinsicHeight() and self.dom.tag != 'html':
+               
               self.setLogicalHeight(self.logicHeight() + child.logicHeight()+child.marginTop())
            child = child.nextSibling()
 

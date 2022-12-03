@@ -1,5 +1,6 @@
 from ..FieldBase import FieldBase
 import taichi as ti 
+from ..event.Event  import EventType
 
 vec2 = ti.math.vec2
 vec3 = ti.math.vec3
@@ -41,6 +42,7 @@ class RenderObject(FieldBase):
     view_dom_tags=['html','body','div','p','a','span','img','canvas','button','input','h1','h2']
     def __init__(self) -> None:
         super().__init__()
+        self.root = None
         self.parent = None
         self.m_previousSibling = None
         self.m_nextSibling = None
@@ -55,13 +57,24 @@ class RenderObject(FieldBase):
         self._isBlock = False
         self.posChildNeedsLayout = True
         self.m_needsLayout = True
+        self.m_needsUpdateField = True
+        self._paintCallback = None
         
     def setDocument(self,doc):
         self.doc=doc
 
-    def addChild(self,obj):
+    def addChild(self,obj,root=None):
         if obj is None :
             return    
+        if root is None:
+            root = self
+            while root:
+                if root.parent:
+                    root=root.parent
+                else:
+                    break    
+         
+        obj.root=root
         obj.parent=self
         oldLen = len(self.children)
         if oldLen>0:
@@ -88,15 +101,40 @@ class RenderObject(FieldBase):
     def paintText(self):
         pass
 
+    def reLayout(self):
+        root = self.root
+        if root:
+            root.layout() 
+               
+    def rePaint(self):
+        root = self.root
+        if root:
+            # print('rePaint',root)
+            root.paint() 
+               
+
     def paint(self):
         self.style.fillField()
+        if self.m_needsUpdateField:
+            self.m_needsUpdateField=False
         if thisField := self.doc.getObjStructField(self):
             if self.style:
                 thisField.style_addr = self.style.getAddr() 
-            self.renderByTi(self.getAddr())  
+            if self._paintCallback and callable(self._paintCallback):
+                image = self._paintCallback()
+                
+                if image is not None:
+                    # self.renderInTi(self.getAddr())
+                    self.renderInTiByExternal(self.getAddr(),image)
+                # else:
+                #     self.renderInTi(self.getAddr())      
+            else:        
+                self.renderInTi(self.getAddr())  
             if self.isText:
-               self.paintText()      
+                self.paintText()      
         child = self.firstChild()
+        # if self.dom and self.dom.tag == 'canvas':
+        #     print(child)
         while child: 
            child.paint()
            child = child.nextSibling()
@@ -128,6 +166,9 @@ class RenderObject(FieldBase):
                 break    
         return p
 
+    def hitTest(self,pointer):
+        pass    
+
     def fillInFieldFrameRect(self):
         if thisField := self.doc.getObjStructField(self):
             # print(thisField,self.frameRect['width'])
@@ -144,7 +185,8 @@ class RenderObject(FieldBase):
     def is_visible(style):
         return style is not None and 'display' in style and style['display']!='none';
 
-
+    def setPaintCallback(self,callback):
+        self._paintCallback = callback 
     
     @ti.func
     def inBorder(self,i, j,frame_width,frame_height, s):
@@ -184,12 +226,29 @@ class RenderObject(FieldBase):
         return result
 
     
-
     @ti.kernel
-    def renderByTi(self,objAddr:ti.i32): 
+    def renderInTiByExternal(self,objAddr:ti.i32,image:ti.types.ndarray()): 
         obj_field = self.doc.f_render_objects[objAddr]
         (frame_w,frame_h)=self.doc.f_layer_frames.shape
-        # print(frame_h)
+        frame_rect =ti.cast(obj_field.frame_rect,ti.i32) 
+        w=frame_rect[0]
+        h=frame_rect[1]
+        x=frame_rect[2]
+        y=frame_rect[3]
+        print(w,h,x,y,frame_h)
+        for i,j in ti.ndrange(w, h):
+                abs_x = i+x
+                abs_y = frame_h-y-j
+                c = vec3(image[i,j,0],image[i,j,1],image[i,j,2])
+                # print(abs_x,abs_y)
+                # self.doc.f_layer_frames[abs_x,abs_y]=vec3(0)
+                if abs_x>=0 and abs_x<frame_w and abs_y>=0 and abs_y <frame_h:
+                    self.doc.f_layer_frames[i,j]=c
+
+    @ti.kernel
+    def renderInTi(self,objAddr:ti.i32): 
+        obj_field = self.doc.f_render_objects[objAddr]
+        (frame_w,frame_h)=self.doc.f_layer_frames.shape
         frame_rect =ti.cast(obj_field.frame_rect,ti.i32) 
 
         # for m in ti.static(range(4)):
@@ -213,7 +272,7 @@ class RenderObject(FieldBase):
                     for k in ti.static(range(3)):
                         bg_color[k]=s.bg_color[k]
                     # print(bg_color)    
-                    self.doc.f_layer_frames[abs_x,abs_y]+=self.caclColor(self.doc.f_layer_frames[abs_x,abs_y],bg_color,opacity)   
+                    self.doc.f_layer_frames[abs_x,abs_y]=self.caclColor(self.doc.f_layer_frames[abs_x,abs_y],bg_color,opacity)   
 
     @ti.kernel
     def renserChar(self,charBitmap:ti.types.ndarray(),x:ti.i32,y:ti.i32,objAddr:ti.i32):
@@ -222,11 +281,17 @@ class RenderObject(FieldBase):
         s = self.doc.f_styles[style_addr]
         (frame_w,frame_h)=self.doc.f_layer_frames.shape
         opacity=s.opacity
+        font_color=s.font_color
+        print('font_color',font_color)
         for i,j in ti.ndrange(charBitmap.shape[0],charBitmap.shape[1]):
-            # for j in range()
-              abs_x=i+x+20
-              abs_y=frame_h-y+j-20
-              fontColor = vec3(charBitmap[i,j,0],charBitmap[i,j,1],charBitmap[i,j,2])
-              
-            #   self.doc.f_layer_frames[abs_x,abs_y]=fontColor
-              self.doc.f_layer_frames[abs_x,abs_y]=self.caclColor(self.doc.f_layer_frames[abs_x,abs_y],fontColor,opacity) 
+            if charBitmap[i,j,0]>-1:
+                fontColor =vec3(font_color[0]*charBitmap[i,j,0],font_color[1]*charBitmap[i,j,1],font_color[2]*charBitmap[i,j,2]) 
+                abs_x=i+x+20
+                abs_y=frame_h-y+j-20
+                #   fontColor=(fontColor/255.)**1.25
+                fontColor=ti.pow(fontColor/255., 1.25)
+                 
+                #   fontColor = vec3(charBitmap[i,j,0],charBitmap[i,j,1],charBitmap[i,j,2])
+                
+                #   self.doc.f_layer_frames[abs_x,abs_y]=fontColor
+                self.doc.f_layer_frames[abs_x,abs_y]=self.caclColor(self.doc.f_layer_frames[abs_x,abs_y],fontColor,opacity) 

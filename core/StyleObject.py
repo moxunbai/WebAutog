@@ -19,15 +19,14 @@ def getDistanceVal(v):
     return [0.,0]    
 # def parseD4(v):
 
-def parseColor(s):  # sourcery skip: avoid-builtin-shadow
+def parseColor(s,useFull=False):  # sourcery skip: avoid-builtin-shadow
     if s is None or len(s) not in [4,7]:
         return [0,0,0]
     hex=  s[1:]
     if len(hex)==3:
-        return [int(hex[i:i+1]+hex[i:i+1], 16)/255 for i in range(3)]
-    return [int(hex[i:i+2], 16)/255 for i in (0, 2, 4)]
-aa=parseColor('#ff0000') # (255, 165, 1)
-print('color',aa)
+        return [int(hex[i:i+1]+hex[i:i+1], 16)/(1 if useFull else 255) for i in range(3)]
+    return [int(hex[i:i+2], 16)/(1 if useFull else 255)  for i in (0, 2, 4)]
+
 def parseBorder(s):
     vals = splitStr(s)
     w = max(0,parsePxValue(vals[0])) if len(vals)>0 else 0
@@ -172,13 +171,13 @@ class StyleObject(FieldBase):
         self.font_size=0.0
         self.font_weight=0.0
         self.font_color=[0.,0.,0.]
-        self.setDate(data) 
+        self.setData(data) 
 
     @staticmethod
     def getBaseName():
        return 'StyleObject'
     
-    def setDate(self,data):
+    def setData(self,data):
         for k,v in data.items():
             match k:
                 case 'display':
@@ -242,7 +241,7 @@ class StyleObject(FieldBase):
                         self.font_size=max(10,parsePxValue(v))     
                 case 'color':
                     if v!='none': 
-                        self.font_color= parseColor(v)  
+                        self.font_color= parseColor(v,True)  
                         
                 case 'opacity':
                     opy = float(v)
@@ -362,3 +361,4 @@ class StyleObject(FieldBase):
             styleField.border_type = vec4(self.border_type)
             styleField.border_radius = vec4(self.border_radius)
             styleField.opacity = self.opacity
+            styleField.font_color = vec3(self.font_color)

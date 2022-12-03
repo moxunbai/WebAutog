@@ -7,6 +7,7 @@ import importlib
 import os
 import sys
 from .FontUtil import TureTypeLoader
+from .event.ScriptEventListener import ScriptEventListener
 
 field_max_len=6
 
@@ -16,8 +17,12 @@ class HTMLDocument():
     f_render_objects = None
     f_styles = None
     f_layer_frames=None
+    tonemapped_buffer=None
     classtype_tield={}
     option={}
+    idMapNde={}
+
+    AnimationFrames=[]
 
     ttfLoader=None
 
@@ -37,6 +42,7 @@ class HTMLDocument():
         HTMLDocument.f_render_objects=RenderObjectStruct.field()
         HTMLDocument.f_styles=StyleStruct.field()
         HTMLDocument.f_layer_frames=ti.Vector.field(3,ti.f32)
+        HTMLDocument.tonemapped_buffer=ti.Vector.field(3,ti.f32)
         fm.registFields(RenderObject.getBaseName(),HTMLDocument.f_render_objects)
         fm.registFields(StyleObject.getBaseName(),HTMLDocument.f_styles)
         
@@ -45,7 +51,7 @@ class HTMLDocument():
     def __place_field__():
         ti.root.dense(ti.i,field_max_len).place(HTMLDocument.f_render_objects,HTMLDocument.f_styles)
         print(HTMLDocument.option['viewportWidth'])
-        ti.root.dense(ti.ij,(HTMLDocument.option['viewportWidth'],HTMLDocument.option['viewportHeight'])).place(HTMLDocument.f_layer_frames)
+        ti.root.dense(ti.ij,(HTMLDocument.option['viewportWidth'],HTMLDocument.option['viewportHeight'])).place(HTMLDocument.f_layer_frames,HTMLDocument.tonemapped_buffer)
         
         
     @staticmethod
@@ -58,13 +64,29 @@ class HTMLDocument():
            fa = obj.getAddr()
            return fd[fa]    
  
-    # def getElementById(self,domId):
-    #     return self.
+    @staticmethod
+    def setInIdMap(id,dom):
+        HTMLDocument.idMapNde[id]=dom
+
+    @staticmethod
+    def getElementById(id):
+        return HTMLDocument.idMapNde[id] if id in HTMLDocument.idMapNde else None
+
+    @staticmethod
+    def requestAnimationFrame(func):
+        HTMLDocument.AnimationFrames.append(func)
+
+    @staticmethod
+    def handleAnimationFrames():
+        if (HTMLDocument.AnimationFrames) and (func := HTMLDocument.AnimationFrames.pop()):
+            if callable(func):
+                func()
+        
+   
     def initScripts(self):
         scripts = []
 
         def findScripts(node):
-            print('node',node.tag)
             if node.tag == 'script':
                 scripts.append(node)
             else:
@@ -75,15 +97,15 @@ class HTMLDocument():
         for dom in self.children:
             findScripts(dom)   
 
-        path = os.path.abspath('.')
-        print('cur path',path, os.path.realpath(sys.argv[0]) )
+        
         global document 
         document = self
         for scriptDom in scripts:
             if scriptDom.src:
                 moduleName =  scriptDom.src.split('.')[0]     
-                moduleScope = importlib.__import__( moduleName,globals() )       
-                print('moduleName',moduleName,moduleScope)   
-                moduleScope.onClick({'ssss':112})
+                moduleScope = importlib.__import__( moduleName,globals() )  
+                ScriptEventListener.registScriptScope(moduleScope)     
+                # print('moduleName',moduleName,moduleScope)   
+                # moduleScope.onClick({'ssss':112})
 
 

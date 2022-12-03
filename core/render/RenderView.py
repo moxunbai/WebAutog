@@ -2,6 +2,7 @@
 from .RenderBlock import RenderBlock
 from .RenderInline import RenderInline
 from .RenderText import RenderText
+from .RenderCanvas import RenderCanvas
 
 class RenderView(RenderBlock):
 
@@ -19,7 +20,18 @@ class RenderView(RenderBlock):
 
     def caclWidth(self):
         pass
-        # self.frameRect['width']=self.logicWidth()+logicWidth 
+     
+    def caclLogicHeight(self):
+        winOption =self.doc.option 
+        self.setLogicalHeight(winOption['viewportHeight'])
+        print('caclLogicHeight',winOption['viewportHeight'],self.frameRect['height'])
+
+    def computeTop(self):
+        pass
+
+    def computeLeft(self):
+        pass
+    
     def isIntrinsicHeight(self):
         return True    
     @staticmethod
@@ -29,6 +41,8 @@ class RenderView(RenderBlock):
             return None
         if dom.tag == 'html':
             return  RenderView(dom)
+        if dom.tag == 'canvas':
+            return RenderCanvas(dom)    
         d = style['display']
         if d=='block':
             renderObj =  RenderBlock(dom)
@@ -43,6 +57,11 @@ class RenderView(RenderBlock):
         #     renderObj.addChild(textObj)
         return renderObj     
              
+    
+    def paint(self):
+        self.doc.f_layer_frames.fill(0.)
+        super().paint()
+            
            
     @staticmethod
     def genTextObj(text):

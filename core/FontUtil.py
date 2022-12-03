@@ -10,8 +10,7 @@ class TureTypeLoader():
 
     def genTextBitmap(self,text,fontSize,color):
 
-        flags = FT_LOAD_RENDER| FT_LOAD_FORCE_AUTOHINT| FT_LOAD_NO_HINTING
-        print('===='+text+'=====')    
+        flags = FT_LOAD_RENDER| FT_LOAD_FORCE_AUTOHINT| FT_LOAD_NO_HINTING 
         self._ttfFace.set_char_size(fontSize * 64)
 
         prev_char = 0
@@ -54,24 +53,22 @@ class TureTypeLoader():
 
         offset_x=0
         offset_y=0
-        # if fontSize>rows:
-        #     offset_y = int((fontSize-rows)/2)
-        # if fontSize>cols:
-        #     offset_x = int((fontSize-cols)/2)
-        print(color)
-
+    
         for row in range(rows):
             for col in range(cols):
                 if glyph_pixels[row * cols + col] != 0:
                     try: 
                         imx_x= offset_x+ col
                         imx_y=rows- row-offset_y
-                        grayRate = glyph_pixels[row * cols + col] 
-                        img[imx_x][imx_y][0] = grayRate*color[0]
-                        img[imx_x][imx_y][1] = grayRate*color[1]
-                        img[imx_x][imx_y][2] = grayRate*color[2]
+                        grayRate = glyph_pixels[row * cols + col]/255 
+                        # img[imx_x][imx_y][0] = grayRate*color[0]
+                        # img[imx_x][imx_y][1] = grayRate*color[1]
+                        # img[imx_x][imx_y][2] = grayRate*color[2]
+                        img[imx_x][imx_y][0] = grayRate 
+                        img[imx_x][imx_y][1] = grayRate 
+                        img[imx_x][imx_y][2] = grayRate 
                         
                     except:
                         continue
-        img=(img/255)**1.25              
+        # img=(img/255)**1.25              
         return img        

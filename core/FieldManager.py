@@ -38,7 +38,7 @@ def addFieldDeclare(func):
 def addFieldPlaced(func):
     field_place_funcs.append(func)
 
-def fieldsBuilder():
+def fieldsBuild():
     for f in field_decl_funcs:
         f()
 

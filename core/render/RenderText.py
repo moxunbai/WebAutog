@@ -17,7 +17,6 @@ class RenderText(RenderBox):
         if self.doc:
             fontColor = self.style.fontColor()
             fontSize = int(self.style.fontSize())
-            print(self.text,fontSize,fontColor) 
             self.textBitmaps = self.doc.ttfLoader.genTextBitmap(self.text,fontSize,fontColor)  
             # print(self.textBitmaps)  
 

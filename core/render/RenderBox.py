@@ -118,3 +118,29 @@ class RenderBox(RenderObject):
             else:
                 pre = pre.previousSibling()
         return pre    
+
+    def isDomLeaf(self):
+        return self.dom and self.dom.isLeaf()
+    def hitTest(self,event):
+        if event is None:
+            return None
+        target = None
+        posInClientX=event.clientX
+        posInClientY=event.clientY
+        rangeX=(self.logicalLeft(),self.logicalLeft()+self.logicalWidth())
+        rangeY=(self.logicalTop(),self.logicalTop()+self.logicalHeight())
+        
+        if posInClientX>=rangeX[0] and posInClientX<=rangeX[1] and posInClientY>=rangeY[0] and posInClientY<=rangeY[1]:
+            # print(posInClientX,posInClientY,rangeX,rangeY,self.dom.tag)
+            if self.isDomLeaf():
+                # print(posInClientX,posInClientY,rangeX,rangeY,self.dom.tag)
+                # print('hit self',self.dom.tag,self.dom.id)
+                return self
+            for child in self.children:
+                target= child.hitTest(event)
+                if target:
+                    #  print('hit child',target.dom.tag,target.dom.id)
+                     break
+            if target is None:
+                target=self
+        return target                

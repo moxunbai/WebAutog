@@ -2,11 +2,12 @@
 
 from html.parser import HTMLParser
 from html.entities import name2codepoint
-from .CSSParser import CSSParser 
+from .CSSParser import CSSParser  
 
 
 from .dom import createDomObject
 
+ 
 class HTMLParser(HTMLParser):
 
     def __init__(self, *, convert_charrefs: bool = ...) -> None:
@@ -15,7 +16,7 @@ class HTMLParser(HTMLParser):
     
     def handle_starttag(self,tag,attrs):
         # global self.curDom
-        newObj = createDomObject(tag,attrs)
+        newObj = createDomObject(tag,attrs) 
         if self.curDom is not None:
             self.curDom.addChild(newObj)  
         else:
@@ -35,8 +36,8 @@ class HTMLParser(HTMLParser):
         
     def handle_startendtag(self,tag,attrs):
         if self.curDom is not None:
-
-            self.curDom.addChild(createDomObject(tag,attrs))
+            newObj = createDomObject(tag,attrs) 
+            self.curDom.addChild(newObj)
             
         
     def handle_data(self,data):

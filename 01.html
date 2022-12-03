@@ -4,12 +4,12 @@
 <body>
 <!-- test html parser -->
      
-    <div id="div1" style="width:100px;height:70px;color:#000000;" class="name">
+    <div id="div1" style="width:100px;height:70px;" class="name" onmouseenter="hoverIn" onmouseleave="hoverOut">
         哈哈
         
     </div>
     <div id="div2" class="div2">
-        <div class="block1"></div>
+        <div id="div_click" class="block1" onMouseup="onClick"></div>
         <div class="block1"></div>
         <div class="block1"></div>
 
@@ -19,10 +19,10 @@
 <style>
     .name{
         color:#333333;
-        font-size:14px;
+        font-size:54px;
         margin-top:20px;
         margin-left:100px;
-        background-color: #333333;
+        background: #333333;
         border:1px solid #ff0000;
         padding:9px
     }
@@ -45,6 +45,9 @@
         width:100px;
         height:18px;
         margin-left:10px;
+    }
+    .hover{
+        color:#ff0000
     }
 </style>
 </html>

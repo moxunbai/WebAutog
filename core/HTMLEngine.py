@@ -9,8 +9,17 @@ from functools import cmp_to_key
 from  . import FieldManager as fm
 import taichi as ti
 import math
+from .event.EventManager import generateFromTaichiEvent,dispatchEvent
 
 parser = HTMLParser()
+
+
+@ti.kernel
+def tonemap():
+    for i,j in HTMLDocument.tonemapped_buffer:
+        # print(i)
+        HTMLDocument.tonemapped_buffer[i, j] = HTMLDocument.f_layer_frames[i, j]
+    
 
 global document 
 def load(fname,option):
@@ -20,54 +29,37 @@ def load(fname,option):
         root = parser.parse(c)
         document = HTMLDocument(root,option)
         renderView = buildRenderTree()
-        fm.fieldsBuilder()
+        
+        document.initScripts()
+        fm.fieldsBuild()
         fm.fieldsPlace()
+        clientWidth=document.option['viewportWidth']
+        clientHeight=document.option['viewportHeight']
         renderView.layout()
         renderView.paint()
-        document.initScripts()
-        # ro = document.f_render_objects[0]
-        # print(document.f_styles)
-        # print('taichi val:',document.f_styles.border_width.to_numpy())
-        # print('taichi val:',document.f_render_objects.frame_rect.to_numpy())
-
-        print('TEST=======',33/255.0)
-        gui = ti.GUI('Hello World!', (document.option['viewportWidth'], document.option['viewportHeight']))
+        gui = ti.GUI('Hello World!', (clientWidth, clientHeight))
+        i = 0
+        interval = 10
         while gui.running:
-            image = HTMLDocument.f_layer_frames.to_numpy()
-            # print(gui.get_cursor_pos())
-            gui.set_image(image)
-            gui.show()
+            if gui.get_event():
+                mouse_x, mouse_y = gui.get_cursor_pos()
+                # print(gui.event.key,gui.event.type,mouse_x,gui.event.pos[1])
+                if event := generateFromTaichiEvent(gui.event, (clientWidth, clientHeight)):
+                    if targetRender := fintHitRenderObject(renderView,event): 
+                        targetDom = targetRender.dom
+                        # if targetDom.id:
+                        #      print(targetDom.tag,targetDom.id,mouse_x, mouse_y,event.clientX,event.clientY)
+                        dispatchEvent(targetDom,event)
+                document.handleAnimationFrames()  
+            # document.getElementById('render_canvas').paint()       
+            if i%interval ==0:    
+                 
+                image = HTMLDocument.f_layer_frames.to_numpy()
+                # print(image[99,100,:])
+                gui.set_image(image)
+                gui.show()
+            i+=1    
 
-@ti.func
-def inRect(i, j, x, y, w, h):
-    rst = True
-    if i < x or i > x + w:
-        rst =False
-    if j<y or j>y+h:
-        rst = False
-    return rst         
- 
-@ti.kernel
-def render(renderObjCount:ti.i32):
-    for i,j in HTMLDocument.f_layer_frames:
-
-        for k in range(renderObjCount):
-            obj_field =  HTMLDocument.f_render_objects[k]  
-            frame_rect = obj_field.frame_rect
-             
-            w=frame_rect[0]
-            h=frame_rect[1]
-            x=frame_rect[2]
-            y=frame_rect[3]
-            if  inRect(i, j, x, y, w, h):
-                style_addr = obj_field.style_addr  
-                if style_addr>-1:
-                    s = HTMLDocument.f_styles[style_addr]
-                    border_use = s.border_use
-                    if border_use[0] == 1 and j==y:
-                        print(j)
-                        HTMLDocument.f_layer_frames[i,j]=ti.Vector([s.border_color[0],s.border_color[1],s.border_color[2]])
-                        
  
 def buildRenderTree():
     global document
@@ -81,17 +73,9 @@ def buildRenderTree():
         if dom is None or not RenderObject.is_view(dom):
             # print('Dom no renderObj:',dom.tag)
             return
-        attr_dict = dom.attr_dict
-        computedStyle = {}
-        for r in dom.caclDomStyle( cssRules):
-            # print('rrrrr=',r)
-            computedStyle.update(r['style'])
-        if 'style' in attr_dict:
-            styles = CSSParser.parse(attr_dict['style'])
-            dom.styles=styles
-            computedStyle.update(styles)
-        # print('styles',dom.tag,computedStyle)
-            
+        
+        computedStyle = dom.computeStyles(cssRules)
+        
         if not RenderObject.is_visible(computedStyle):
             # print('hide Dom',dom.tag,computedStyle)
             return    
@@ -105,12 +89,12 @@ def buildRenderTree():
                 textObj=RenderView.genTextObj(dom.data)
                 textObj.style=renderObj.style
                 textObj.setDocument(document)
-                renderObj.addChild(textObj)
+                renderObj.addChild(textObj,renderObj.root)
             for child in dom.children:
-                # print('child',child.tag)
                 childR = walkDomTree(child)
+                # print('child',child.tag)
                 if childR:
-                   renderObj.addChild(childR)      
+                   renderObj.addChild(childR,renderObj.root)      
                  
                 
         return renderObj
@@ -120,3 +104,8 @@ def buildRenderTree():
     # if renderView:
     #    renderView.setDocument(document) 
     return renderView   
+
+
+def fintHitRenderObject(renderObj,event):
+    return renderObj.hitTest(event)
+    
