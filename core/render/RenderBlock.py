@@ -18,7 +18,7 @@ class RenderBlock(RenderBox):
 
     def updateStyles(self,e): 
         newStyles = self.dom.computeStyles(self.dom.cssRules) 
-        # print('newStyles',self.dom.classNames,newStyles['color'],self.style.font_color)
+        print('newStyles',self.dom.classNames,newStyles['color'],self.style.font_color)
         self.style.setData(newStyles)
         self.m_needsUpdateField = False
         self.reLayout()

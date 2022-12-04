@@ -69,11 +69,12 @@ def stopRender(e=None):
         return 
     
     isStart=False
-    print('isStart',isStart,activeDom is None)
     if activeDom :
+        print('isStart',isStart,activeDom.classNames)
         activeDom.removeCssClass('active')
-    elif e:
+    if e:
         activeDom=e.target
+        print('isStart',isStart,activeDom.classNames)
     activeDom.addCssClass('active')    
 
        
