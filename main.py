@@ -13,4 +13,4 @@ if __name__ == '__main__':
         html_fn ="00.html"
     else:
         html_fn = sys.argv[1]
-    HTMLEngine.load(html_fn,{'viewportWidth':800,'viewportHeight':750})
+    HTMLEngine.load(html_fn,{'viewportWidth':800,'viewportHeight':700})

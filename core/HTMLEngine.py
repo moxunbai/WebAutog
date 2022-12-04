@@ -44,9 +44,9 @@ def load(fname,option):
                         # if targetDom.id:
                         #      print(targetDom.tag,targetDom.id,mouse_x, mouse_y,event.clientX,event.clientY)
                         dispatchEvent(targetDom,event)
-            document.handleAnimationFrames()  
             # document.getElementById('render_canvas').paint()       
             if i%interval ==0:    
+                document.handleAnimationFrames()  
                 gui.set_image(HTMLDocument.f_layer_frames)
                 gui.show()
                  

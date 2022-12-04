@@ -89,12 +89,12 @@ class RenderBlock(RenderBox):
                else:  
                    if p :
                      l= p.logicalLeft()+p.paddingLeft()+ self.marginLeft() if self.floatLeft() else p.logicalLeft()+p.paddingLeft()+availableWidth- self.marginRight()-self.logicalWidth()
-               if self.dom.id:
-                    print(self.dom.id,'l==',l,availableWidth,self.floatLeft() )      
+            #    if self.dom.id:
+            #         print(self.dom.id,'l==',l,availableWidth,self.floatLeft() )      
         else:
             l= p.logicalLeft()+p.paddingLeft()+ self.marginLeft()  if p else 0.            
-            if self.dom.id and self.isFloat():
-                    print(self.dom.id,'l==',l,self.floatLeft() )  
+            # if self.dom.id and self.isFloat():
+            #         print(self.dom.id,'l==',l,self.floatLeft() )  
         self.frameRect['x']=l
 
     def layout(self):

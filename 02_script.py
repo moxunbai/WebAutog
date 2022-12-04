@@ -2,8 +2,7 @@
 from demo_pt import RayTracingRender
 from core.HTMLEngine import document
 from core import FieldManager as fm
-import time
-import numpy as np
+import time 
 
 rayTracer=None
 canvasDom = document.getElementById('render_canvas')
@@ -37,31 +36,40 @@ if canvasDom :
 
 activeDom=None
 
-
 isStart=False
+
+def doRender():
+     global isStart 
+     if isStart:
+        sppDom.setData(rayTracer.count)
+        canvasDom.paint()
+        document.requestAnimationFrame(doRender)  
+
 
 def startRender(e=None):
     global isStart 
     global activeDom
 
-    isStart=True
     if activeDom and e:
         activeDom.removeCssClass('active')
     elif e:
         activeDom=e.target
         activeDom.addCssClass('active')        
-    canvasDom.paint()
-    sppDom.setData(rayTracer.count)
-    if isStart:
-        document.requestAnimationFrame(startRender)  
+    
+    isStart=True    
+    
+    doRender()
+    # if isStart:
+    #     document.requestAnimationFrame(startRender)  
 
 def stopRender(e=None): 
     global isStart 
-    global activeDom
+    global activeDom 
     if not isStart:
         return 
     
     isStart=False
+    print('isStart',isStart,activeDom is None)
     if activeDom :
         activeDom.removeCssClass('active')
     elif e:
@@ -69,7 +77,6 @@ def stopRender(e=None):
     activeDom.addCssClass('active')    
 
        
-
 def hoverIn(e): 
     e.target.addCssClass('hover')
 def hoverOut(e): 
