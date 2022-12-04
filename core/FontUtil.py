@@ -12,42 +12,28 @@ class TureTypeLoader():
 
         flags = FT_LOAD_RENDER| FT_LOAD_FORCE_AUTOHINT| FT_LOAD_NO_HINTING 
         self._ttfFace.set_char_size(fontSize * 64)
-
-        prev_char = 0
-        pen = freetype.Vector()
-        
-        hscale = 1.0
-        matrix = freetype.Matrix(int(hscale) * 0x10000, int(1.2 * 0x10000), \
-                int(0.0 * 0x10000), int(1.1 * 0x10000))
-        curPen = freetype.Vector()
-        penTranslate = freetype.Vector()
         
         imgList = []
 
         for everyChar in text:
             # self._ttfFace.set_transform(matrix, penTranslate)
             self._ttfFace.load_char(everyChar,flags)
-            kerning = self._ttfFace.get_kerning(prev_char, everyChar)
-            pen.x += kerning.x
+            # kerning = self._ttfFace.get_kerning(prev_char, everyChar)
+            # pen.x += kerning.x
             slot = self._ttfFace.glyph
             bitmap = slot.bitmap
 
-            curPen.x = pen.x
-            curPen.y = pen.y - slot.bitmap_top * 64
             imgList.append(self.getWordBitmap(  bitmap,  fontSize,color))
             
-
-            pen.x += slot.advance.x
-            prev_char = curPen
-
         return imgList    
 
     def getWordBitmap(self,bitmap, fontSize,color):
 
+        # print('color',color)
         cols = bitmap.width
         rows = bitmap.rows
         # img=np.zeros(shape=(fontSize+1,fontSize+1))
-        img=np.zeros(shape=(fontSize+1,fontSize+1,3),dtype=np.float32)
+        img=np.zeros(shape=(cols+1,rows+1,3),dtype=np.float32)
         img.fill(-1)
         glyph_pixels = bitmap.buffer
 
@@ -61,12 +47,12 @@ class TureTypeLoader():
                         imx_x= offset_x+ col
                         imx_y=rows- row-offset_y
                         grayRate = glyph_pixels[row * cols + col]/255 
-                        # img[imx_x][imx_y][0] = grayRate*color[0]
-                        # img[imx_x][imx_y][1] = grayRate*color[1]
-                        # img[imx_x][imx_y][2] = grayRate*color[2]
-                        img[imx_x][imx_y][0] = grayRate 
-                        img[imx_x][imx_y][1] = grayRate 
-                        img[imx_x][imx_y][2] = grayRate 
+                        img[imx_x][imx_y][0] = grayRate*color[0]
+                        img[imx_x][imx_y][1] = grayRate*color[1]
+                        img[imx_x][imx_y][2] = grayRate*color[2]
+                        # img[imx_x][imx_y][0] = grayRate 
+                        # img[imx_x][imx_y][1] = grayRate 
+                        # img[imx_x][imx_y][2] = grayRate 
                         
                     except:
                         continue

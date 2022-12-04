@@ -17,12 +17,15 @@ class RenderText(RenderBox):
         if self.doc:
             fontColor = self.style.fontColor()
             fontSize = int(self.style.fontSize())
+            # print('===='+self.text+'=======')
             self.textBitmaps = self.doc.ttfLoader.genTextBitmap(self.text,fontSize,fontColor)  
             # print(self.textBitmaps)  
 
     def paintText(self):
+        self.text=self.parent.dom.data
         x =int( self.logicalLeft())
         y = int(self.logicalTop())
+        self.parseText()
         for bitmap in self.textBitmaps:
             # print(type(bitmap))
            self.renserChar(bitmap,x,y,self.getAddr())  
@@ -31,10 +34,7 @@ class RenderText(RenderBox):
     
     def caclWidth(self):
         parentContentWidth = p.contentWidth() if (p := self.containerBlock()) else 0
-        w=0
-        for bitmap in self.textBitmaps:
-            w+=bitmap.shape[0]  
-
+        w = sum(bitmap.shape[0] for bitmap in self.textBitmaps)
         self.frameRect['width']=  min(parentContentWidth,w) 
 
     def caclLogicHeight(self):

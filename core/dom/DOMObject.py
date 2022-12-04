@@ -17,7 +17,6 @@ def createAttributeEventListener(dom):
             k=k.lower()
             if k.startswith('on'):
                 eventType = k[2:]
-                print('createAttributeEventListener eventType',eventType,v,dom.id)
                 dom.addEventListener(eventType,EventListener(v))
                 
 class DOMObject(EventTarget):
@@ -55,7 +54,10 @@ class DOMObject(EventTarget):
         self.children.append(obj)  
         return obj
     def setData(self,data):
-        self.data=data
+        self.data=str(data)
+        event =Event()
+        event.type = 'dataChange'  
+        self.dispatchEvent(event)
       
     def isLeaf(self):
         return len(self.children)==0

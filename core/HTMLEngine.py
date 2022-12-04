@@ -8,18 +8,11 @@ import re
 from functools import cmp_to_key
 from  . import FieldManager as fm
 import taichi as ti
-import math
+import numpy as np
 from .event.EventManager import generateFromTaichiEvent,dispatchEvent
 
 parser = HTMLParser()
-
-
-@ti.kernel
-def tonemap():
-    for i,j in HTMLDocument.tonemapped_buffer:
-        # print(i)
-        HTMLDocument.tonemapped_buffer[i, j] = HTMLDocument.f_layer_frames[i, j]
-    
+   
 
 global document 
 def load(fname,option):
@@ -40,6 +33,7 @@ def load(fname,option):
         gui = ti.GUI('Hello World!', (clientWidth, clientHeight))
         i = 0
         interval = 10
+      
         while gui.running:
             if gui.get_event():
                 mouse_x, mouse_y = gui.get_cursor_pos()
@@ -50,14 +44,14 @@ def load(fname,option):
                         # if targetDom.id:
                         #      print(targetDom.tag,targetDom.id,mouse_x, mouse_y,event.clientX,event.clientY)
                         dispatchEvent(targetDom,event)
-                document.handleAnimationFrames()  
+            document.handleAnimationFrames()  
             # document.getElementById('render_canvas').paint()       
             if i%interval ==0:    
-                 
-                image = HTMLDocument.f_layer_frames.to_numpy()
-                # print(image[99,100,:])
-                gui.set_image(image)
+                gui.set_image(HTMLDocument.f_layer_frames)
                 gui.show()
+                 
+                # image = HTMLDocument.f_layer_frames.to_numpy(dtype=np.float32)
+                # print(image[99,100,:])
             i+=1    
 
  
@@ -83,11 +77,14 @@ def buildRenderTree():
         renderObj = RenderView.genObj(dom,computedStyle)
         # print('new Render',r)
         if renderObj:
+            # print(dom.tag,dom.id,computedStyle)
             renderObj.style=StyleObject(computedStyle)
+            # print('newStyles=======', dom.classNames, renderObj.style.getAddr())
             renderObj.setDocument(document) 
             if dom.data:
                 textObj=RenderView.genTextObj(dom.data)
                 textObj.style=renderObj.style
+                # textObj.style=StyleObject(computedStyle)
                 textObj.setDocument(document)
                 renderObj.addChild(textObj,renderObj.root)
             for child in dom.children:

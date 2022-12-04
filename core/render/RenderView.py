@@ -24,7 +24,6 @@ class RenderView(RenderBlock):
     def caclLogicHeight(self):
         winOption =self.doc.option 
         self.setLogicalHeight(winOption['viewportHeight'])
-        print('caclLogicHeight',winOption['viewportHeight'],self.frameRect['height'])
 
     def computeTop(self):
         pass

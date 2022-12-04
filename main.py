@@ -2,11 +2,15 @@
 from core.CssBgObject import *
 from core import HTMLEngine
 import taichi as ti
+import sys
 
 ti.init(arch=ti.gpu)
 
-# cssFields = CssBgFields()
-# cssFields.setup_data_cpu(20)
 
-
-HTMLEngine.load('02.html',{'viewportWidth':800,'viewportHeight':750})
+if __name__ == '__main__':
+    html_fn=None
+    if len(sys.argv)==1:
+        html_fn ="01.html"
+    else:
+        html_fn = sys.argv[1]
+    HTMLEngine.load(html_fn,{'viewportWidth':800,'viewportHeight':750})

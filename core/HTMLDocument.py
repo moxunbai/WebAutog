@@ -9,7 +9,7 @@ import sys
 from .FontUtil import TureTypeLoader
 from .event.ScriptEventListener import ScriptEventListener
 
-field_max_len=6
+field_max_len=1000
 
 @ti.data_oriented
 class HTMLDocument():
@@ -50,7 +50,6 @@ class HTMLDocument():
     @staticmethod
     def __place_field__():
         ti.root.dense(ti.i,field_max_len).place(HTMLDocument.f_render_objects,HTMLDocument.f_styles)
-        print(HTMLDocument.option['viewportWidth'])
         ti.root.dense(ti.ij,(HTMLDocument.option['viewportWidth'],HTMLDocument.option['viewportHeight'])).place(HTMLDocument.f_layer_frames,HTMLDocument.tonemapped_buffer)
         
         

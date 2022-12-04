@@ -18,8 +18,8 @@ class RenderBlock(RenderBox):
 
     def updateStyles(self,e): 
         newStyles = self.dom.computeStyles(self.dom.cssRules) 
+        # print('newStyles',self.dom.classNames,newStyles['color'],self.style.font_color)
         self.style.setData(newStyles)
-        print('newStyles',newStyles['color'],self.style.font_color)
         self.m_needsUpdateField = False
         self.reLayout()
         self.rePaint()
@@ -28,6 +28,7 @@ class RenderBlock(RenderBox):
     def watchDom(self):
         if self.dom:
             self.dom.addEventListener('cssChange',EventListener(self.updateStyles))        
+            self.dom.addEventListener('dataChange',EventListener(self.updateStyles))        
 
     def caclWidth(self):
         parentContentWidth = p.contentWidth() if (p := self.containerBlock()) else 0
@@ -53,9 +54,7 @@ class RenderBlock(RenderBox):
         if previous : 
             # print('computeTop==previous==',self.dom.tag,self.dom.id,previous.dom.tag,previous.dom.id)
             availableWidth = 0
-            # if p := self.containerBlock():
-            #     if isFloat:
-            #         availableWidth = p.contentWidth()-previous.logicalLeft()-previous.clientWidth() if self.floatLeft() else 
+            
             if not previous.isFloat():        
                t = previous.logicalTop()+previous.logicHeight() + self.marginTop()   
             else:
@@ -99,8 +98,8 @@ class RenderBlock(RenderBox):
         curX=0
         baseline=self.paddingTop()
         child = self.firstChild()
-        if self.dom.id:
-            print(self.dom.id,self.logicalLeft(),self.logicalTop())
+        # if self.dom.id:
+        #     print(self.dom.id,self.logicalLeft(),self.logicalTop())
         while child: 
            child.layout()
         #    if child.isInline():

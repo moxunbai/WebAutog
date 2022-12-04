@@ -495,6 +495,12 @@ class RayTracingRender():
         self.count_var[0] = (self.count_var[0] + 1) % (stratify_res * stratify_res)
 
 
+    def reset(self):
+        self.count=0
+        self.count_var[0]
+        self.color_buffer.fill(0.)
+        self.tonemapped_buffer.fill(0.)
+
     @ti.kernel
     def tonemap(self,accumulated: ti.f32):
         for i, j in self.tonemapped_buffer:
