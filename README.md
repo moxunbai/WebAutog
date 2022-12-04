@@ -12,3 +12,10 @@
 * 难点：1、数据的组织，模版文件解析后生成的渲染树、布局数据、渲染样式数据、字体数据等如何对应组织写入taichi field(交互过程中以上数据要增删改);2、布局；inline布局及文字排版难道了，放弃；3、文字渲染，此次实现了ttf格式字体文件的渲染，最开始想解析ttf文件后，在kernel中画轮廓并填充，后面感觉太花时间，降级为在python作用于用freetype画好位图，传给kennel渲染；4、事件管理，将taichi GUI的event解析为类浏览器的一套API，模版脚本的动态导入绑定等
 * 准备比赛中实现的内容：RenderTree的重排、重绘机制；文字渲染，float布局，canvas标签；事件处理机制，元素事件相关(解析绑定的鼠标事件：点击，hover)；
 * 其它：使用的第三方包：numpy、cssutils、freetype、HTMLParser
+
+# 运行步骤
+## 安装依赖
+*  pip install -r requirements.txt
+## 运行DEMO
+* python main 01.html
+* python main 02.html
