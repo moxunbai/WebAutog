@@ -52,7 +52,7 @@ def startRender(e=None):
 
     if activeDom and e:
         activeDom.removeCssClass('active')
-    elif e:
+    if e:
         activeDom=e.target
         activeDom.addCssClass('active')        
     
