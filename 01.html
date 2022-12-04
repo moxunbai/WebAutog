@@ -4,23 +4,36 @@
 <body>
 <!-- test html parser -->
      
-    <div id="div1"   class="name" onmouseenter="hoverIn" onmouseleave="hoverOut">
-        Taichi Hackatho-答辩32
+    <div id="div1"   class="header" onmouseenter="hoverIn" onmouseleave="hoverOut">
+        <div class="title">
+            基本的布局渲染
+
+        </div>
+        
     </div>
+    <div style="height:20px;font-size:24px;padding:5px">block flow</div>
+    <div  >
+        <div class="item0" ></div>
+        <div class="item0"></div>
+        <div class="item0"></div>
+    
+    </div>
+    <div style="height:20px;font-size:24px;padding:5px">内部左浮动</div>
     <div id="div2" class="block1">
-        <div id="div_click" class="item1" onMouseup="onClick"></div>
+        <div id="div_click" class="item1" ></div>
         <div class="item1"></div>
         <div class="item1"></div>
 
     </div>
-    <div  class="block2">
-        <div class="left">
+    <div  id="div3"  class="block2">
+        <div style="height:20px;font-size:24px;padding:5px">左右浮动，内部block flow</div>
+        <div id="left" class="left">
             <div class="item2"></div>
             <div class="item1"></div>
             <div class="item1"></div>
 
         </div>
-        <div class="right">
+        <div id="right" class="right">
             <div class="item2"></div>
             <div class="item1"></div>
             <div class="item1"></div>
@@ -30,21 +43,41 @@
     <script src="01_script.py"></script>
 </body>
 <style>
-    .name{
-        color:#333333;
-        font-size:54px;
+    #div1{
+        
         margin-top:20px;
         margin-left:100px;
+        height:100px; 
+        padding:9px
+    }
+    .title{
+        color:#333333;
+        font-size:54px;
         height:70px;
+        
+        padding:9px
+    }
+    .name{
+        color:#333333;
+        font-size:24px;
+        height:30px;
         
         padding:9px
     }
      
     .block1{
-        margin-top:40px;
+        margin-top:4px;
         height:20px;
         background-color: #cccccc;
         border:2px solid #00ff00;
+        
+    }
+    .item0{
+        background-color: #ccc;
+        border:1px solid #4000ff;
+       
+        margin-top:10px; 
+        height:18px;
         
     }
     .item1{

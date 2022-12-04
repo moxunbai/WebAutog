@@ -16,15 +16,17 @@ class TureTypeLoader():
         imgList = []
 
         for everyChar in text:
+            # print('==='+everyChar+'===')
             # self._ttfFace.set_transform(matrix, penTranslate)
             self._ttfFace.load_char(everyChar,flags)
             # kerning = self._ttfFace.get_kerning(prev_char, everyChar)
             # pen.x += kerning.x
             slot = self._ttfFace.glyph
             bitmap = slot.bitmap
-
-            imgList.append(self.getWordBitmap(  bitmap,  fontSize,color))
-            
+            img=self.getWordBitmap(  bitmap,  fontSize,color)
+            if everyChar == ' ':
+                img=np.zeros(shape=(10,1,3),dtype=np.float32)
+            imgList.append(img)
         return imgList    
 
     def getWordBitmap(self,bitmap, fontSize,color):

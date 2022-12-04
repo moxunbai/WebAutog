@@ -119,7 +119,7 @@ class StyleStruct():
     border_radius:vec4
     border_color:ti.types.vector(12, float)
 
-    font_size:float
+    font_size:int
     font_weight:float
     font_color:vec3
 
@@ -362,3 +362,4 @@ class StyleObject(FieldBase):
             styleField.border_radius = vec4(self.border_radius)
             styleField.opacity = self.opacity
             styleField.font_color = vec3(self.font_color)
+            styleField.font_size =  int(self.font_size)

@@ -56,7 +56,10 @@ class RenderBlock(RenderBox):
             availableWidth = 0
             
             if not previous.isFloat():        
-               t = previous.logicalTop()+previous.logicHeight() + self.marginTop()   
+               t = previous.logicalTop()+previous.logicHeight() + self.marginTop()  
+               if self.dom.id:
+                   print('previous not float',self.dom.id,t)
+               
             else:
                if p := self.containerBlock():
                     availableWidth = p.contentWidth()-previous.logicalLeft()-previous.clientWidth() if self.floatLeft()   else p.contentWidth()-previous.logicalLeft() 
@@ -81,12 +84,17 @@ class RenderBlock(RenderBox):
                if p := self.containerBlock():
                     availableWidth = p.contentWidth()-previous.logicalLeft()-previous.clientWidth()-self.marginLeft() if self.floatLeft()   else p.contentWidth()-previous.logicalLeft() -self.marginRight()
                if availableWidth >self.logicalWidth():
-                  l = previous.logicalLeft()+ previous.logicalWidth()+self.marginLeft()
+                #   l = previous.logicalLeft()+ previous.logicalWidth()+self.marginLeft()
+                  l= previous.logicalLeft()+ previous.logicalWidth()+self.marginLeft() if self.floatLeft() else p.logicalLeft()+p.paddingLeft()+availableWidth- self.marginRight()-self.logicalWidth()
                else:  
                    if p :
-                     l= p.logicalLeft()+p.paddingLeft()+ self.marginLeft() if self.floatLeft() else p.logicalLeft()-p.logicalLeft()-p.paddingRight()- self.marginRight()
+                     l= p.logicalLeft()+p.paddingLeft()+ self.marginLeft() if self.floatLeft() else p.logicalLeft()+p.paddingLeft()+availableWidth- self.marginRight()-self.logicalWidth()
+               if self.dom.id:
+                    print(self.dom.id,'l==',l,availableWidth,self.floatLeft() )      
         else:
             l= p.logicalLeft()+p.paddingLeft()+ self.marginLeft()  if p else 0.            
+            if self.dom.id and self.isFloat():
+                    print(self.dom.id,'l==',l,self.floatLeft() )  
         self.frameRect['x']=l
 
     def layout(self):

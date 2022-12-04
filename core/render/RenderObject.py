@@ -153,7 +153,7 @@ class RenderObject(FieldBase):
     def floatLeft(self):
         return   self.style.floatLeft() if self.style else False 
     def floatRight(self):
-        return   self.style.floatLeft() if self.style else False 
+        return   self.style.floatRight() if self.style else False 
 
     def isInline(self):
         return self.inline    
@@ -212,7 +212,7 @@ class RenderObject(FieldBase):
                in_pos=2 
         if border_use[3]==1 and border_width[3]>0:
             w=border_width[3]
-            if j<=w:
+            if j<w:
                in_pos=3 
         if in_pos>-1:
         #    print(frame_width,frame_height) 
@@ -276,7 +276,7 @@ class RenderObject(FieldBase):
                 s = self.doc.f_styles[style_addr]
                 opacity=s.opacity
                 abs_x = i+x
-                abs_y = frame_h+j-h
+                abs_y = frame_h+j-h-y
                 in_pos,border_color  = self.inBorder(i,j,w,h,s)
                 if in_pos>-1:
                     # print(border_color)
@@ -299,24 +299,15 @@ class RenderObject(FieldBase):
         (frame_w,frame_h)=self.doc.f_layer_frames.shape
         opacity=s.opacity
         font_color=s.font_color
-        # print('font_color',x,y,charBitmap.shape[1])
+        font_size=s.font_size
         for i,j in ti.ndrange(charBitmap.shape[0],charBitmap.shape[1]):
             if charBitmap[i,j,0]>-1:
                 # fontColor =vec3(font_color[0]*charBitmap[i,j,0],font_color[1]*charBitmap[i,j,1],font_color[2]*charBitmap[i,j,2]) 
                 abs_x=i+x
-                abs_y=frame_h-y-charBitmap.shape[1]+j
-                #   fontColor=(fontColor/255.)**1.25
-                # fontColor=ti.pow(fontColor/255., 1.25)
+                # abs_y=frame_h-y-charBitmap.shape[1]+j
+                abs_y=frame_h-y-font_size+j
                  
                 fontColor = vec3(charBitmap[i,j,0],charBitmap[i,j,1],charBitmap[i,j,2])
                 
-                #   self.doc.f_layer_frames[abs_x,abs_y]=fontColor
-                bg=self.doc.f_layer_frames[abs_x,abs_y]
-                # fontColor+=0.2*bg
-                # self.doc.f_layer_frames[abs_x,abs_y]=self.diffSelColor(bg,fontColor)
-                # g=fontColor[0]*0.2126*255 + 0.7152*255*fontColor[1] + 0.0722*255*fontColor[2]
-                # g=fontColor[0]+fontColor[1]+fontColor[2]
-                # if g<0.4:
-                #     fontColor+=bg
-                # self.doc.f_layer_frames[abs_x,abs_y]=self.caclColor(bg,fontColor,opacity) 
-                self.doc.f_layer_frames[abs_x,abs_y]=fontColor/255 
+                if charBitmap.shape[1]>1:
+                     self.doc.f_layer_frames[abs_x,abs_y]=fontColor/255 

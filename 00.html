@@ -1,0 +1,104 @@
+<html>
+
+<head></head>
+
+<body>
+    <!-- test html parser -->
+
+    <div id="div1" class="header" onmouseenter="hoverIn" onmouseleave="hoverOut">
+        <div class="title1">
+            Taichi Hackatho-答辩32
+
+        </div>
+        <div class="title2">
+            名称：简版浏览器
+        </div>
+    </div>
+    <div style="margin-left: 10px;margin-top: 8px;">
+        <div class="title2">
+            简述浏览器五脏六腑（参考WebKit）
+        </div>
+        <div class="item">
+            解析：浏览器拿到一个html文件，会解析html结构的语法生成一颗DOM树，同时解析css
+        </div>
+        <div class="item">
+            语法生成一颗css树，然后遍历DOM树节点并按规则匹配对应的样式，然后生成一颗
+        </div>
+        <div class="item">
+           Render 树，同时还要解析script标签;
+        </div>
+    </div>
+    <div style="margin-left: 10px;margin-top: 8px;">
+        <div class="title2">
+            实现功能
+        </div> 
+        <div class="item">
+            1、布局:基本的盒模型，block flow；浮动布局,(css  float)
+        </div> 
+        <div class="item">
+            2、基本渲染:背景色(css background)，边框(border 位置 宽度 颜色)
+        </div> 
+        <div class="item">
+            3、字体渲染:看这些就知道了，支持字体大小颜色样式设置(css font-size color)，
+        </div> 
+        <div class="item">
+            4、交互性:支持基本的鼠标事件(onmouseenter,onmouseleave,onmousemove
+        </div> 
+        <div class="item">
+            ,onmousedown,onmouseup)可以在DOM标签属性里绑定事件
+        </div> 
+        <div class="item">
+            5、DOM API:document.getElementById :根据ID查DOM，
+        </div> 
+        <div class="item">
+            document.requestAnimationFrame:添加进下一次渲染中执行
+        </div> 
+        <div class="item">
+         dom.addCssName :添加一个样式， dom.removeCssName :删除一个样式
+        </div> 
+        <div class="item">
+          dom.paint 单独渲染一个节点子树,dom.setData:设置文字
+        </div> 
+        <div class="item">
+          canvas.setPaintCallback:canvas元素的渲染回调
+        </div> 
+        
+    </div>
+</body>
+<style>
+    #div1 {
+
+        margin-top: 8px;
+        padding-left: 10px;
+        height: 100px; 
+        background: #ddd;
+        border-bottom:1px solid #999
+    }
+
+    .title1 {
+        color: #333333;
+        font-size: 34px;
+        height: 50px;
+
+        padding: 9px
+    }
+    .title2 {
+        color: #666;
+        font-size: 24px;
+        height: 30px;
+
+        padding: 4px
+    }
+
+    .item {
+        color: #000;
+        font-size: 20px;
+        height: 28px;
+        padding-left: 8px
+
+    }
+
+   
+</style>
+
+</html>
