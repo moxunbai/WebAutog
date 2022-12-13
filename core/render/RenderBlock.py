@@ -18,7 +18,7 @@ class RenderBlock(RenderBox):
 
     def updateStyles(self,e): 
         newStyles = self.dom.computeStyles(self.dom.cssRules) 
-        print('newStyles',self.dom.classNames,newStyles['color'],self.style.font_color)
+        # print('newStyles',self.dom.classNames,newStyles['color'],self.style.font_color)
         self.style.setData(newStyles)
         self.m_needsUpdateField = False
         self.reLayout()
@@ -57,8 +57,8 @@ class RenderBlock(RenderBox):
             
             if not previous.isFloat():        
                t = previous.logicalTop()+previous.logicHeight() + self.marginTop()  
-               if self.dom.id:
-                   print('previous not float',self.dom.id,t)
+            #    if self.dom.id:
+            #        print('previous not float',self.dom.id,t)
                
             else:
                if p := self.containerBlock():

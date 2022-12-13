@@ -19,8 +19,8 @@ class EventTarget():
 
     def dispatchEvent(self,event):
         eventType = event.type 
-        if eventType =='mouseenter':
-          print(eventType,self._eventlListenerMap.keys(),event.clientX)
+        # if eventType =='mouseenter':
+        #   print(eventType,self._eventlListenerMap.keys(),event.clientX)
         if eventType and eventType in  self._eventlListenerMap:
             for listener in self._eventlListenerMap[eventType] :
                  event.target=self
